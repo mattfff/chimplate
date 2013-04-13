@@ -1,0 +1,102 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'bundler/setup'
+
+require "thor"
+require "mailchimp"
+require "yaml"
+
+begin
+    require 'chimplate'
+rescue LoadError
+    require 'rubygems'
+    require 'chimplate'
+end
+ 
+class Chimplate < Thor
+  option :api_key, :default => ""
+  option :name, :default => "New Chimplate Project"
+  option :force, :default => false
+  desc "setup", "Write Chimplate project config files."
+  def setup
+    FileUtils.rm destination if options[:force]
+    
+    if File.exist? destination
+      puts "Looks like this project is already set up, the config file already exists."
+    else
+      File.open(destination, "w+") do |file|
+        config = options.dup
+        config.delete :force
+        file.write(config.to_hash.to_yaml)
+      end
+    end
+  end
+
+  option :force, :default => false
+  desc "pull", "Pull templates from mailchimp account and write to disk."
+  def pull
+    api.templates["user"].each do |template_info|
+      template = api.templateInfo "tid" => template_info["id"]
+      filename = Dir.pwd + "/" + template_info["id"].to_s + "-" + sanitize_filename(template_info["name"]) + ".html"
+
+      FileUtils.rm filename if options[:force]
+
+      if File.exists? filename
+        puts "Skipped #{filename} because it already exists"
+      else
+        File.open(filename, "w+") do |file|
+          file.write(template["source"])
+        end
+      end
+    end
+  end
+
+  desc "push", "Push current disk versions of templates to mailchimp."
+  def push
+    Dir.glob("*-*.html").each do |template_filename|
+      tid, template_name = template_filename.gsub(".html", "").split("-")
+
+      File.open template_filename, "rb" do |file|
+        api.templateUpdate "id" => tid, "values" => { "html" => file.read }
+      end
+
+      puts "Updated template #{template_filename}.\n";
+    end
+  end
+
+  protected
+    def api
+      if !File.exist? destination
+        puts "No config file here, please run `chimplate setup` first"
+        exit
+      else
+        config = YAML.load_file(destination)
+      end
+
+      @api ||= Mailchimp::API.new config["api_key"]
+    end
+
+    def destination
+      Dir.pwd + "/" + ".chimplate"
+    end
+
+    #from http://stackoverflow.com/questions/1939333/how-to-make-a-ruby-string-safe-for-a-filesystem
+    def sanitize_filename(filename)
+      # Split the name when finding a period which is preceded by some
+      # character, and is followed by some character other than a period,
+      # if there is no following period that is followed by something
+      # other than a period (yeah, confusing, I know)
+      fn = filename.split(/(?<=.)\.(?=[^.])(?!.*\.[^.])/m)
+
+      # We now have one or two parts (depending on whether we could find
+      # a suitable period). For each of these parts, replace any unwanted
+      # sequence of characters with an underscore
+      fn.map! { |s| s.gsub(/[^a-z0-9\-]+/i, '_') }
+
+      # Finally, join the parts with a period and return the result
+      return fn.join '.'
+    end
+end
+
+Chimplate.start(ARGV)
