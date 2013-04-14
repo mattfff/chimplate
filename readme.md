@@ -7,7 +7,7 @@ What is it?
 I've found myself doing a lot of template editing for clients lately,
 and though Mailchimp's excellent in-browser editing tools make it easy
 to get up and running, they don't provide any of the tools required for
-managing a large number of with lots of common elements, managing
+managing a large number of templates with lots of common elements, managing
 revisions, etc, etc.
 
 There are tons of tools available to make this process easier, chiefly
