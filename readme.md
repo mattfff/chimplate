@@ -12,7 +12,7 @@ revisions, etc, etc.
 
 There are tons of tools available to make this process easier, chiefly
 git. I wanted to have all of the templates stored in a git repo so I
-could track changes to each files, generate patches to apply to similar
+could track changes to each file, generate patches to apply to similar
 templates, etc, but the process of making local modifications and then
 copying and pasting into Mailchimp's template window was a major pain.
 As a result, I would get lazy and make edits directly in the editor
@@ -22,9 +22,9 @@ Solution?
 ---------
 
 I thought a tool to automatically push and pull templates from local
-text files into Mailchimp templates in the account would be a good
+text files into Mailchimp templates in would be a good
 solution, so Chimplate was born. I also added live update support
-similar to compass --watch, so that Mailchimp will be updated on the fly
+similar to `compass --watch`, so that Mailchimp will be updated on the fly
 as you change files on your disk. Now you can use your favorite local
 editor, save the files, and see the live changes in Mailchimp, all super
 fast!
@@ -34,15 +34,15 @@ Usage
 
 Install chimplate via `gem install chimplate`.
 
-Chimplate relies on the mailchimp gem, which requires Ruby 1.9, so
-you'll need a more up to date ruby than ships on OSX unfortunately.
-Homebrew can help you wish that, or rvm or rbenv.
+Chimplate relies on the mailchimp gem, which requires Ruby 1.9+, so
+you'll need a more up to date ruby than ships on OSX, unfortunately.
+Homebrew can help you with that, or rvm or rbenv.
 
 Next, make a project folder you'd like to work from. This folder should
 be dedicated to only the templates for a single MC account, because the
-folder-wide config file will store that API key.
+folder-wide config file will store that account's API key.
 
-In that folder, enter `chimplate setup --api_key YOUR_API_KEY --name
+In that folder, run `chimplate setup --api_key YOUR_API_KEY --name
 "Project Name"`
 
 This will write a .chimplate file to that directory which stores that
@@ -55,7 +55,8 @@ Now:
 2. Make a change in one or more files, and run `chimplate push`. This
    will update the templates in your account.
 3. Run `chimplate watch`. This will watch for changes to the html files
-   in this directory, and update Mailchimp on the fly as they are saved.
+   in this directory, and update Mailchimp on the fly as they are
+updated.
 
 All of the files are stored with a specific file format, as follows:
 template_id-template_name.html. So if you have a template that has an ID
@@ -69,7 +70,7 @@ as that's the primary identifier between MailChimp and your local copy.
 New Files
 ---------
 
-Now that you know about the format, you can initiate a totally new
+Now that you know about the format, you can create a totally new
 template locally and push it to MailChimp. To do so:
 
 1. Create a new html file with your template content in the same folder,
