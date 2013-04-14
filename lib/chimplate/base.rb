@@ -3,7 +3,7 @@ require "yaml"
 
 module Chimplate
   class Base
-    def self.write_config(configi, force = false)
+    def self.write_config(config, force = false)
       FileUtils.rm destination if force
       
       return false if File.exist? destination
