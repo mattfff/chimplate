@@ -8,6 +8,7 @@ rescue LoadError
 end
 
 require "thor"
+require "listen"
 
 class ChimplateCli < Thor
   option :api_key, :default => ""
@@ -35,6 +36,17 @@ class ChimplateCli < Thor
   desc "push", "Push current disk versions of templates to mailchimp."
   def push
     Chimplate::Base.push
+  end
+
+  desc "watch", "Watch for file changes and push them to Mailchimp."
+  def watch
+    puts "Watching for file changes in the current directory. Ctrl+C to quit.\n\n"
+
+    listener = Listen.to(Dir.pwd, :relative_paths => true, :filter => /\.html$/) do |modified, added, removed|
+      Chimplate::Base.push_file(modified.first)
+    end
+
+    listener.start
   end
 end
 

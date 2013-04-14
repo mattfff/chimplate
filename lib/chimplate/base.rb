@@ -39,13 +39,24 @@ module Chimplate
 
     def self.push
       Dir.glob("*-*.html").each do |template_filename|
-        tid, template_name = template_filename.gsub(".html", "").split("-")
+        push_file(template_filename)
+      end
+    end
 
-        File.open template_filename, "rb" do |file|
+    def self.push_file(template_filename)
+      tid, template_name = template_filename.gsub(".html", "").split("-")
+
+      File.open template_filename, "rb" do |file|
+        if tid == "new"
+          new_tid = api.templateAdd :name => template_name.gsub("_", " "), :html => file.read
+          new_filename = new_tid.to_s + '-' + template_name + ".html"
+          FileUtils.mv template_filename, new_filename
+
+          puts "Saved new template #{new_filename}.\n";
+        else
           api.templateUpdate "id" => tid, "values" => { "html" => file.read }
+          puts "Updated template #{template_filename}.\n";
         end
-
-        puts "Updated template #{template_filename}.\n";
       end
     end
 

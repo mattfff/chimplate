@@ -18,4 +18,5 @@ Gem::Specification.new do |s|
   s.add_dependency "mailchimp"
   s.add_dependency "json"
   s.add_dependency "thor"
+  s.add_dependency "listen"
 end
