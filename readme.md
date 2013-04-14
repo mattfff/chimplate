@@ -87,6 +87,18 @@ want to create a new file, kill the watch process via Ctrl+C, make the
 new file, run `chimplate push`, and then re-start the `chimplate watch`
 process to resume pushing your changes on the fly back to Mailchimp.
 
+Gotchas
+-------
+
+Once you start editing your templates this way, it's important to avoid
+using Mailchimp's editor in your browser. If you make changes there, and
+then don't pull them with Chimplate before pushing your local copies
+again, you could overwrite the changes you made directly in Mailchimp!
+There's no function in Chimplate (or in Mailchimp) for checking
+modification times, so you could lose work if you aren't rigorous about
+doing it all in one place (or at least all via a git repo to centralize
+version control). You have been warned!
+
 TODO
 ----
 
@@ -96,5 +108,7 @@ it doesn't match the expected format Chimplate will probably give you a nasty
 stack trace and run home to mommy. Sorry! I hope to fix this soon...
 3. Provide some sort of support for template deletion. At this point I'm
 happy leaving it to the Mailchimp UI, since accidental deletion would be
-a pain. But since we have local copies now, it wouldn't be too bad! Git
-FTW!
+a bummer.
+4. Provide some diff support, so you could diff a template to see what's
+   different between your local copy and Mailchimp's version before you
+push.
