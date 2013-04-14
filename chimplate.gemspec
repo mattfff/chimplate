@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
-  s.homepage      = 'http://bitforge.us'
+  s.homepage      = 'https://github.com/mattfff/chimplate'
   s.require_paths = ["lib"]
   s.add_dependency "mailchimp"
   s.add_dependency "json"
