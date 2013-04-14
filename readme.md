@@ -87,6 +87,19 @@ want to create a new file, kill the watch process via Ctrl+C, make the
 new file, run `chimplate push`, and then re-start the `chimplate watch`
 process to resume pushing your changes on the fly back to Mailchimp.
 
+Diff
+----
+If you want to see what's different between your local copy and what's
+in Mailchimp, just run `chimplate diff`. This will diff all of the
+current local files against mailchimp.
+
+If you just want to diff one file, pass the full filename: `chimplate
+diff --filename 12345-My_Template.html`.
+
+Note: Diff support requires a working diff. If you're a Windows user
+you'll need working diff, as described on the Diffy page:
+https://github.com/samg/diffy.
+
 Gotchas
 -------
 
@@ -109,6 +122,3 @@ stack trace and run home to mommy. Sorry! I hope to fix this soon...
 3. Provide some sort of support for template deletion. At this point I'm
 happy leaving it to the Mailchimp UI, since accidental deletion would be
 a bummer.
-4. Provide some diff support, so you could diff a template to see what's
-   different between your local copy and Mailchimp's version before you
-push.
