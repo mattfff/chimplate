@@ -34,8 +34,14 @@ class ChimplateCli < Thor
   end
 
   desc "push", "Push current disk versions of templates to mailchimp."
+  option :filename, :default => ""
   def push
-    Chimplate::Base.push
+    unless options[:filename].empty?
+      puts "File #{options[:filename]} does not exist." and return unless File.exists? options[:filename]
+      Chimplate::Base.push_file(options[:filename])
+    else
+      Chimplate::Base.push
+    end
   end
 
   desc "watch", "Watch for file changes and push them to Mailchimp."
@@ -47,6 +53,17 @@ class ChimplateCli < Thor
     end
 
     listener.start
+  end
+
+  desc "diff", "Show the difference between Mailchimp's copy and my copy."
+  option :filename, :default => ""
+  def diff
+    unless options[:filename].empty?
+      puts "File #{options[:filename]} does not exist." and return unless File.exists? options[:filename]
+      Chimplate::Base.diff_file(options[:filename])
+    else
+      Chimplate::Base.diff
+    end
   end
 end
 

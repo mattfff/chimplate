@@ -1,5 +1,6 @@
 require "mailchimp"
 require "yaml"
+require "diffy"
 
 module Chimplate
   class Base
@@ -15,26 +16,26 @@ module Chimplate
 
     def self.pull(options = {})
       api.templates["user"].each do |template_info|
-      template = api.templateInfo "tid" => template_info["id"]
-      filename = Dir.pwd + "/" + template_info["id"].to_s + "-" + sanitize_filename(template_info["name"]) + ".html"
+        template = api.templateInfo "tid" => template_info["id"]
+        filename = Dir.pwd + "/" + template_info["id"].to_s + "-" + sanitize_filename(template_info["name"]) + ".html"
 
-      write = true
-      if File.exist? filename
-        if options[:force] || yield(filename)
-          FileUtils.rm filename 
-        else
-          puts "Skipping #{filename}.\n"
-          write = false
+        write = true
+        if File.exist? filename
+          if options[:force] || yield(filename)
+            FileUtils.rm filename 
+          else
+            puts "Skipping #{filename}.\n"
+            write = false
+          end
+        end
+
+        if write
+          File.open(filename, "w+") do |file|
+            file.write(template["source"])
+            puts "Saved template #{filename}.\n";
+          end
         end
       end
-
-      if write
-        File.open(filename, "w+") do |file|
-          file.write(template["source"])
-          puts "Saved template #{filename}.\n";
-        end
-      end
-    end
     end
 
     def self.push
@@ -44,23 +45,47 @@ module Chimplate
     end
 
     def self.push_file(template_filename)
-      tid, template_name = template_filename.gsub(".html", "").split("-")
+      file_data = file_info(template_filename)
 
       File.open template_filename, "rb" do |file|
-        if tid == "new"
-          new_tid = api.templateAdd :name => template_name.gsub("_", " "), :html => file.read
-          new_filename = new_tid.to_s + '-' + template_name + ".html"
+        if file_data[:tid] == "new"
+          new_tid = api.templateAdd :name => file_data[:template_name].gsub("_", " "), :html => file.read
+          new_filename = new_tid.to_s + '-' + file_data[:template_name] + ".html"
           FileUtils.mv template_filename, new_filename
 
           puts "Saved new template #{new_filename}.\n";
         else
-          api.templateUpdate "id" => tid, "values" => { "html" => file.read }
+          api.templateUpdate "id" => file_data[:tid], "values" => { "html" => file.read }
           puts "Updated template #{template_filename}.\n";
         end
       end
     end
 
+    def self.diff_file(template_filename)
+      file_info = file_info(template_filename)
+
+      File.open template_filename, "rb" do |file|
+        template = api.templateInfo "tid" => file_info[:tid]
+        puts "Diff between local #{template_filename} and remote template.\n\n"
+
+        puts Diffy::Diff.new(template["source"].chomp, file.read.chomp, :context => 2, :allow_empty_diff => true).to_s(:color)
+      end
+    end
+
+    def self.diff
+      Dir.glob("*-*.html").each do |template_filename|
+        diff_file(template_filename)
+        puts "\n\n----------------------------------------------------------\n\n"
+      end
+    end
+
     protected
+      def self.file_info(filename)
+        tid, template_name = filename.gsub(".html", "").split("-")
+
+        return {:tid => tid, :template_name => template_name}
+      end
+
       def self.api
         if !File.exist? destination
           puts "No config file here, please run `chimplate setup` first"

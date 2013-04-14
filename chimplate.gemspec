@@ -19,4 +19,5 @@ Gem::Specification.new do |s|
   s.add_dependency "json"
   s.add_dependency "thor"
   s.add_dependency "listen"
+  s.add_dependency "diffy"
 end
