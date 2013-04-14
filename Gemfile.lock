@@ -1,3 +1,11 @@
+PATH
+  remote: .
+  specs:
+    chimplate (0.0.1)
+      json
+      mailchimp
+      thor
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -15,6 +23,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  chimplate!
   json
   mailchimp
   thor
